@@ -1,0 +1,20 @@
+{
+  "name": "fake-stack-overflow",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+<<<<<<< HEAD
+  ]
+=======
+  ],
+  "dependencies": {
+    "from": "^0.1.7",
+    "project": "^0.1.6",
+    "root": "^3.2.0",
+    "the": "^1.0.2"
+  }
+>>>>>>> 0f95291 (IP1 edits)
+}

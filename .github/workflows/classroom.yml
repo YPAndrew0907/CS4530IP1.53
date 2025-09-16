@@ -1,0 +1,119 @@
+name: Autograding Tests
+'on':
+- push
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Style check
+      id: style-check
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Style check
+        setup-command: npm install
+        command: cd server && npm run lint
+        timeout: 2
+        max-score: 10
+    - name: Controller Collections Test
+      id: controller-collections-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Controller Collections Test
+        setup-command: ''
+        command: cd server && npm run test:single -- tests/controllers/collection.controller.spec.ts
+        timeout: 10
+        max-score: 15
+    - name: Controller Communities Test
+      id: controller-communities-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Controller Communities Test
+        setup-command: ''
+        command: cd server && npm run test:single -- tests/controllers/community.controller.spec.ts
+        timeout: 10
+        max-score: 15
+    - name: Services Collections Test
+      id: services-collections-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Services Collections Test
+        setup-command: ''
+        command: cd server && npm run test:single -- tests/services/collection.service.spec.ts
+        timeout: 2
+        max-score: 10
+    - name: Services Communities Test
+      id: services-communities-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Services Communities Test
+        setup-command: ''
+        command: cd server && npm run test:single -- tests/services/community.service.spec.ts
+        timeout: 2
+        max-score: 10
+    - name: Regression Tests
+      id: regression-tests
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Regression Tests
+        setup-command: ''
+        command: cd server && npm run test
+        timeout: 4
+        max-score: 10
+    - name: Coverage 90 pct
+      id: coverage-90-pct
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Coverage 90 pct
+        setup-command: ''
+        command: cd server && node .grading/coverageGrader.js 95
+        timeout: 2
+        max-score: 4
+    - name: Coverage 90 pct 1
+      id: coverage-90-pct-1
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Coverage 90 pct 1
+        setup-command: npm install
+        command: cd server && node .grading/coverageGrader.js 90
+        timeout: 2
+        max-score: 3
+    - name: Coverage 85 pct
+      id: coverage-85-pct
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Coverage 85 pct
+        setup-command: npm install
+        command: cd server && node .grading/coverageGrader.js 85
+        timeout: 2
+        max-score: 2
+    - name: Coverage 80 pct
+      id: coverage-80-pct
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Coverage 80 pct
+        setup-command: ''
+        command: cd server && node .grading/coverageGrader.js 80
+        timeout: 2
+        max-score: 1
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        STYLE-CHECK_RESULTS: "${{steps.style-check.outputs.result}}"
+        CONTROLLER-COLLECTIONS-TEST_RESULTS: "${{steps.controller-collections-test.outputs.result}}"
+        CONTROLLER-COMMUNITIES-TEST_RESULTS: "${{steps.controller-communities-test.outputs.result}}"
+        SERVICES-COLLECTIONS-TEST_RESULTS: "${{steps.services-collections-test.outputs.result}}"
+        SERVICES-COMMUNITIES-TEST_RESULTS: "${{steps.services-communities-test.outputs.result}}"
+        REGRESSION-TESTS_RESULTS: "${{steps.regression-tests.outputs.result}}"
+        COVERAGE-90-PCT_RESULTS: "${{steps.coverage-90-pct.outputs.result}}"
+        COVERAGE-90-PCT-1_RESULTS: "${{steps.coverage-90-pct-1.outputs.result}}"
+        COVERAGE-85-PCT_RESULTS: "${{steps.coverage-85-pct.outputs.result}}"
+        COVERAGE-80-PCT_RESULTS: "${{steps.coverage-80-pct.outputs.result}}"
+      with:
+        runners: style-check,controller-collections-test,controller-communities-test,services-collections-test,services-communities-test,regression-tests,coverage-90-pct,coverage-90-pct-1,coverage-85-pct,coverage-80-pct

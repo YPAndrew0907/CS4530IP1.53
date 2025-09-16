@@ -1,0 +1,32 @@
+[
+    {
+      "id": "R1",
+      "rubric": "Naming Conventions", 
+      "value": false
+    },
+    {
+      "id": "R2", 
+      "rubric": "Unused Variables",
+      "value": false
+    },
+    {
+      "id": "R3",
+      "rubric": "Documentation",
+      "value": false
+    },
+    {
+        "id": "R4",
+        "rubric": "Design Principles",
+        "value": false
+    },
+    {
+        "id": "R5",
+        "rubric": "Code Duplication",
+        "value": false
+    },
+    {
+      "id": "R6",
+      "rubric": "Adjustments",
+      "value": true
+    }    
+]
