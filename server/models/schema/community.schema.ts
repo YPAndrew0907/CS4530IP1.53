@@ -1,15 +1,17 @@
+import { Schema } from 'mongoose';
+
 /**
  * Mongoose schema for the Community collection.
  *
- * - `participants`: an array of usernames (strings) representing users who are members of the community.
- * - `questions`: an array of ObjectIds referencing the Question collection.
- * - Timestamps store `createdAt` & `updatedAt`.
- * - `name`: Name of the community.
- * - `description`: description of the community.
- * - `admin`: the username of the admin user who created the community.
- * - `visibility`: enum [PUBLIC, PRIVATE].
+ * Fields:
+ * - `name`: unique name of the community (required)
+ * - `description`: a description of the community (required)
+ * - `admin`: the username of the admin user who created the community (required)
+ * - `participants`: array of usernames who are part of the community (defaults to empty array)
+ * - `visibility`: either 'PUBLIC' or 'PRIVATE', defaults to 'PUBLIC'
+ *
+ * Timestamps are automatically added for `createdAt` and `updatedAt` fields.
  */
-
 const communitySchema = new Schema(
   {
     name: {
@@ -30,11 +32,7 @@ const communitySchema = new Schema(
     },
     participants: {
       type: [String],
-      default: [],
-    },
-    questions: {
-      type: [Schema.Types.ObjectId],
-      ref: 'Question',
+      required: true,
       default: [],
     },
     visibility: {
