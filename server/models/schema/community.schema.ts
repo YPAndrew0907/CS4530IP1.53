@@ -1,33 +1,17 @@
-import { Schema } from 'mongoose';
-
 /**
  * Mongoose schema for the Community collection.
  *
- * - `participants`: an array of ObjectIds referencing the User collection.
+ * - `participants`: an array of usernames (strings) representing users who are members of the community.
  * - `questions`: an array of ObjectIds referencing the Question collection.
  * - Timestamps store `createdAt` & `updatedAt`.
  * - `name`: Name of the community.
  * - `description`: description of the community.
+ * - `admin`: the username of the admin user who created the community.
  * - `visibility`: enum [PUBLIC, PRIVATE].
  */
 
 const communitySchema = new Schema(
   {
-    /*
-<<<<<<< HEAD
-    * Task 2.1 - 4 points
-    * The community schema must accommodate the following fields:
-    * name, description, participants, questions, visibility.
-    * Make sure to include necessary validations, default values, and types.
-    * May contain enums.
-    */
-=======
-     * Task 2.1 - 4 points
-     * The community schema must accommodate the following fields:
-     * name, description, participants, questions, visibility.
-     * Make sure to include necessary validations, default values, and types.
-     * May contain enums.
-     */
     name: {
       type: String,
       required: true,
@@ -58,7 +42,6 @@ const communitySchema = new Schema(
       enum: ['PUBLIC', 'PRIVATE'],
       default: 'PUBLIC',
     },
->>>>>>> 0f95291 (IP1 edits)
   },
   {
     collection: 'Community',
@@ -66,8 +49,4 @@ const communitySchema = new Schema(
   },
 );
 
-<<<<<<< HEAD
 export default communitySchema;
-=======
-export default communitySchema;
->>>>>>> 0f95291 (IP1 edits)
