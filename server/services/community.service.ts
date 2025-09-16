@@ -2,17 +2,19 @@ import CommunityModel from '../models/community.model';
 import { Community, CommunityResponse, DatabaseCommunity } from '../types/types';
 
 /**
- * Task 2.4.1 - 3 points
- * Write a function to retrieve a community by its ID.
+ * Service for community-related operations.
+ * Provides functions to retrieve, create, update and delete communities.
+ * Each function returns either a community document (or array of documents)
+ * or an object containing an error message under the `error` key.
+ */
+
+/**
+ * Retrieve a single community by its ID.
+ *
  * @param communityId - The ID of the community to retrieve
- * @returns A Promise resolving to the community document or an error object
+ * @returns A promise that resolves with the community document or an error object
  */
 export const getCommunity = async (communityId: string): Promise<CommunityResponse> => {
-  // - Write your code here -
-<<<<<<< HEAD
-
-  return { error: 'Not implemented' };
-=======
   try {
     const doc = await CommunityModel.findById(communityId);
     if (!doc) {
@@ -22,20 +24,14 @@ export const getCommunity = async (communityId: string): Promise<CommunityRespon
   } catch (err) {
     return { error: `Error when retrieving community: ${(err as Error).message}` };
   }
->>>>>>> 0f95291 (IP1 edits)
 };
 
 /**
- * Task 2.4.2 - 3 points
- * Write a function to retrieve all communities in the database.
- * @returns A Promise resolving to an array of community documents or an error object
+ * Retrieve all communities in the database.
+ *
+ * @returns A promise that resolves with an array of community documents or an error object
  */
 export const getAllCommunities = async (): Promise<DatabaseCommunity[] | { error: string }> => {
-  // - Write your code here -
-<<<<<<< HEAD
-
-  return { error: 'Not implemented' };
-=======
   try {
     const docs = await CommunityModel.find();
     if (!docs) {
@@ -45,27 +41,21 @@ export const getAllCommunities = async (): Promise<DatabaseCommunity[] | { error
   } catch (err) {
     return { error: `Error when retrieving communities: ${(err as Error).message}` };
   }
->>>>>>> 0f95291 (IP1 edits)
 };
 
 /**
- * Task 2.4.3 - 5 points
- * Write a function to toggle a user's membership status in a community.
- * If the user is already a participant, they will be removed.
- * If the user is not a participant, they will be added.
+ * Toggle a user's membership status in a community.
+ * If the user is already a participant they will be removed, otherwise they will be added.
+ * Admin users cannot remove themselves from their own community.
+ *
  * @param communityId - The ID of the community to update
  * @param username - The username of the user whose membership to toggle
- * @returns A Promise resolving to the updated community document or an error object
+ * @returns A promise that resolves with the updated community document or an error object
  */
 export const toggleCommunityMembership = async (
   communityId: string,
   username: string,
 ): Promise<CommunityResponse> => {
-  // - Write your code here -
-<<<<<<< HEAD
-
-  return { error: 'Not implemented' };
-=======
   try {
     if (!communityId || !username) {
       throw new Error('Invalid toggle membership body');
@@ -97,22 +87,16 @@ export const toggleCommunityMembership = async (
       error: `Error when toggling community membership: ${(err as Error).message}`,
     };
   }
->>>>>>> 0f95291 (IP1 edits)
 };
 
 /**
- * Task 2.4.4 - 5 points
- * Write a function to create a new community.
- * The participants list must include the admin user.
+ * Create a new community.
+ * Ensures that required fields are present and that the admin is included in the participants list.
+ *
  * @param communityData - Object containing community details including name, description, visibility, admin, and participants
- * @returns A Promise resolving to the newly created community document or an error object
+ * @returns A promise that resolves with the newly created community document or an error object
  */
 export const createCommunity = async (communityData: Community): Promise<CommunityResponse> => {
-  // - Write your code here -
-<<<<<<< HEAD
-
-  return { error: 'Not implemented' };
-=======
   try {
     const { name, description, admin, visibility, participants } = communityData as unknown as {
       name: string;
@@ -145,28 +129,19 @@ export const createCommunity = async (communityData: Community): Promise<Communi
   } catch (err) {
     return { error: `Error when creating community: ${(err as Error).message}` };
   }
->>>>>>> 0f95291 (IP1 edits)
 };
 
 /**
- * Task 2.4.5 - 4 points
- * Write a function to delete a community by its ID.
- * The user must be the admin of the community to delete it.
- * Handle errors appropriately.
+ * Delete a community by its ID. The requesting user must be the admin of the community.
+ *
  * @param communityId - The ID of the community to delete
  * @param username - The username of the user requesting deletion
- * @returns A Promise resolving to a success object or an error object
+ * @returns A promise that resolves with the deleted community document or an error object
  */
 export const deleteCommunity = async (
   communityId: string,
   username: string,
 ): Promise<CommunityResponse> => {
-  // - Write your code here -
-<<<<<<< HEAD
-
-  return { error: 'Not implemented' };
-};
-=======
   try {
     if (!communityId || !username) {
       throw new Error('Invalid delete request');
@@ -190,4 +165,3 @@ export const deleteCommunity = async (
     return { error: `Error when deleting community: ${(err as Error).message}` };
   }
 };
->>>>>>> 0f95291 (IP1 edits)
