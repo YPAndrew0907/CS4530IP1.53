@@ -20,4 +20,16 @@ declare module '@fake-stack-overflow/shared' {
     remainingObjects?: number;
   }
 }
-// ----------------------------------------------------------------------------
+//
+    // added augmentation for usernameToView
+
+  declare module '@fake-stack-overflow/shared' {
+  interface GetCollectionsByUserIdRequest {
+    params: {
+      usernameToView: string;
+    };
+    query: {
+      currentUsername: string;
+    };
+  }
+}
