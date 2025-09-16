@@ -1,17 +1,11 @@
 import { ObjectId } from 'mongodb';
 import CollectionModel from '../models/collection.model';
-import {
-  Collection,
-  CollectionResponse,
-  DatabaseCollection,
-} from '../types/types';
+import { Collection, CollectionResponse, DatabaseCollection } from '../types/types';
 
 /**
  * Create a new collection.
  */
-export const createCollection = async (
-  collection: Collection,
-): Promise<CollectionResponse> => {
+export const createCollection = async (collection: Collection): Promise<CollectionResponse> => {
   try {
     if (!collection || !collection.name || !collection.username) {
       throw new Error('Invalid collection body');
@@ -29,9 +23,7 @@ export const createCollection = async (
     const created = await CollectionModel.create({
       name,
       description: collection.description ?? '',
-      questions: Array.isArray(collection.questions)
-        ? collection.questions
-        : [],
+      questions: Array.isArray(collection.questions) ? collection.questions : [],
       username,
       isPrivate,
     });
