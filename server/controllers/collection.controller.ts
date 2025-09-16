@@ -16,12 +16,20 @@ import {
 } from '../services/collection.service';
 import { populateDocument } from '../utils/database.util';
 
+/*
+ * The collectionController sets up routes for collection-related API endpoints.
+ * It validates inputs, calls into the service layer, and emits socket events when
+ * collections are created, updated, or deleted. On error, it returns appropriate
+ * status codes and messages.
+ */
 const collectionController = (socket: FakeSOSocket) => {
   const router = express.Router();
 
+  // Validate that a create collection request has required fields
   const isCreateValid = (req: CreateCollectionRequest): boolean =>
     !!req.body.name && !!req.body.username;
 
+  // POST /create
   const createCollectionRoute = async (
     req: CreateCollectionRequest,
     res: Response,
@@ -32,31 +40,28 @@ const collectionController = (socket: FakeSOSocket) => {
     }
     try {
       const { name, description, questions, username, isPrivate } = req.body;
-      const collection = await createCollection({
+      const created = await createCollection({
         name,
         description,
         questions,
         username,
         isPrivate,
       });
-      if ('error' in collection) {
-        throw new Error(collection.error as string);
+      if ('error' in created) {
+        throw new Error(created.error as string);
       }
-
       const populated = await populateDocument(
-        collection._id.toString(),
+        (created as any)._id.toString(),
         'collection',
       );
       if ('error' in populated) {
-        throw new Error(populated.error as string);
+        throw new Error((populated as any).error as string);
       }
-
       socket.emit('collectionUpdate', {
         type: 'created',
         collection: populated as PopulatedDatabaseCollection,
       });
-
-      res.status(200).json(collection);
+      res.status(200).json(populated);
     } catch (err) {
       res
         .status(500)
@@ -64,6 +69,7 @@ const collectionController = (socket: FakeSOSocket) => {
     }
   };
 
+  // DELETE /delete/:collectionId
   const deleteCollectionRoute = async (
     req: CollectionRequest,
     res: Response,
@@ -75,20 +81,25 @@ const collectionController = (socket: FakeSOSocket) => {
       return;
     }
     try {
-      const populated = await populateDocument(collectionId, 'collection');
-      const deleted = await deleteCollection(collectionId, username as string);
+      const deleted = await deleteCollection(
+        collectionId,
+        String(username),
+      );
       if ('error' in deleted) {
         throw new Error(deleted.error as string);
       }
-
-      if (!('error' in populated)) {
-        socket.emit('collectionUpdate', {
-          type: 'deleted',
-          collection: populated as PopulatedDatabaseCollection,
-        });
+      const populated = await populateDocument(
+        (deleted as any)._id.toString(),
+        'collection',
+      );
+      if ('error' in populated) {
+        throw new Error((populated as any).error as string);
       }
-
-      res.status(200).json(deleted);
+      socket.emit('collectionUpdate', {
+        type: 'deleted',
+        collection: populated as PopulatedDatabaseCollection,
+      });
+      res.status(200).json(populated);
     } catch (err) {
       res
         .status(500)
@@ -96,6 +107,7 @@ const collectionController = (socket: FakeSOSocket) => {
     }
   };
 
+  // PATCH /toggleSaveQuestion
   const toggleSaveQuestionRoute = async (
     req: SaveQuestionRequest,
     res: Response,
@@ -118,21 +130,18 @@ const collectionController = (socket: FakeSOSocket) => {
       if ('error' in updated) {
         throw new Error(updated.error as string);
       }
-
       const populated = await populateDocument(
         (updated as any)._id.toString(),
         'collection',
       );
       if ('error' in populated) {
-        throw new Error(populated.error as string);
+        throw new Error((populated as any).error as string);
       }
-
       socket.emit('collectionUpdate', {
         type: 'updated',
         collection: populated as PopulatedDatabaseCollection,
       });
-
-      res.status(200).json(updated);
+      res.status(200).json(populated);
     } catch (err) {
       res
         .status(500)
@@ -140,19 +149,20 @@ const collectionController = (socket: FakeSOSocket) => {
     }
   };
 
+  // GET /getCollectionsByUsername/:username
   const getCollectionsByUsernameRoute = async (
     req: GetCollectionsByUserIdRequest,
     res: Response,
   ): Promise<void> => {
-    const { usernameToView } = req.params;
+    const { username } = req.params;
     const { currentUsername } = req.query;
-    if (!usernameToView || !currentUsername) {
+    if (!username || !currentUsername) {
       res.status(400).send('Invalid collection body');
       return;
     }
     try {
       const list = await getCollectionsByUsername(
-        usernameToView,
+        username,
         String(currentUsername),
       );
       if ('error' in list) {
@@ -162,14 +172,11 @@ const collectionController = (socket: FakeSOSocket) => {
     } catch (err) {
       res
         .status(500)
-        .send(
-          `Error when getting collections by username: ${
-            (err as Error).message
-          }`,
-        );
+        .send(`Error when getting collections: ${(err as Error).message}`);
     }
   };
 
+  // GET /getCollectionById/:collectionId
   const getCollectionByIdRoute = async (
     req: CollectionRequest,
     res: Response,
@@ -181,17 +188,18 @@ const collectionController = (socket: FakeSOSocket) => {
       return;
     }
     try {
-      const coll = await getCollectionById(collectionId, String(username));
-      if ('error' in coll) {
-        throw new Error(coll.error as string);
+      const collection = await getCollectionById(
+        collectionId,
+        String(username),
+      );
+      if ('error' in collection) {
+        throw new Error(collection.error as string);
       }
-      res.status(200).json(coll);
+      res.status(200).json(collection);
     } catch (err) {
       res
         .status(500)
-        .send(
-          `Error when getting collection by id: ${(err as Error).message}`,
-        );
+        .send(`Error when getting collection by id: ${(err as Error).message}`);
     }
   };
 
@@ -199,10 +207,13 @@ const collectionController = (socket: FakeSOSocket) => {
   router.delete('/delete/:collectionId', deleteCollectionRoute);
   router.patch('/toggleSaveQuestion', toggleSaveQuestionRoute);
   router.get(
-    '/getCollectionsByUsername/:usernameToView',
+    '/getCollectionsByUsername/:username',
     getCollectionsByUsernameRoute,
   );
-  router.get('/getCollectionById/:collectionId', getCollectionByIdRoute);
+  router.get(
+    '/getCollectionById/:collectionId',
+    getCollectionByIdRoute,
+  );
 
   return router;
 };
